@@ -1,37 +1,54 @@
 library('move2')
+library('dplyr')
+library('magrittr')
 library('lubridate')
+library('sf')
+library('mgcv')
 
-## The parameter "data" is reserved for the data object passed on from the previous app
+rFunction = function(data) {
 
-# to display messages to the user in the log file of the App in MoveApps
-# one can use the function from the logger.R file:
-# logger.fatal(), logger.error(), logger.warn(), logger.info(), logger.debug(), logger.trace()
-
-# Showcase injecting app setting (parameter `year`)
-rFunction = function(data, sdk, year, ...) {
-  logger.info(paste("Welcome to the", sdk))
-  result <- if (any(lubridate::year(mt_time(data)) == year)) { 
-    data[lubridate::year(mt_time(data)) == year,]
-  } else {
-    NULL
-  }
-  if (!is.null(result)) {
-    # Showcase creating an app artifact. 
-    # This artifact can be downloaded by the workflow user on Moveapps.
-    artifact <- appArtifactPath("plot.png")
-    logger.info(paste("plotting to artifact:", artifact))
-    png(artifact)
-    plot(result)
-    dev.off()
-  } else {
-    logger.warn("nothing to plot")
-  }
-  # Showcase to access a file ('auxiliary files') that is 
-  # a) provided by the app-developer and 
-  # b) can be overridden by the workflow user.
-  fileName <- paste0(getAppFilePath("yourLocalFileSettingId"), "sample.txt")
-  logger.info(readChar(fileName, file.info(fileName)$size))
-
+  # Call provided model:
+  modelfile <- paste0(getAppFilePath("providedModel"), "model.rds")
+  model <- readRDS(modelfile)
+  
+  # prepare for modelling - introduce an upper bound to 'days'
+  data %<>% mutate(response_days = pmin(days, 50))
+  
+  # extract the link function from the model object (m)
+  ilink <- family(model)$linkinv
+  
+  
+  # predict importance on the link scale (link because we make the confidence intervals
+  # on the link scale and then back transform after)
+  browser()
+  
+  pred <- predict(model, data, type = "link", se.fit = TRUE)
+  pred <- cbind(pred, data)
+  pred <- transform(pred, lwr_ci = ilink(fit - (2 * se.fit)),
+                    upr_ci = ilink(fit + (2 * se.fit)),
+                    fitted = ilink(fit)) %>%
+    as.data.frame() %>%
+    dplyr::select(fitted) %>%
+    unlist()
+  
+  result <- data %>% mutate(importance = pred)
+  
+  # browser()
+  # band importance score
+  #bandthresh <- quantile(clust.table$importance, probs=c(0, 0.25, 0.5, 0.7, 0.8, 0.9, 1))
+  bandthresh <- c(0, 0.25, 0.5, 0.75, 0.9, 1.0)
+  result %<>%
+    mutate(impBand = if_else(importance == 0, 0, as.numeric(cut(pred, breaks=c(bandthresh)))))
+  
+  
+  risknames <- data.frame(impBand = c(0:5), impBandchr = c("No-feeding", "Low", "Quitelow", "Medium", "High", "Critical"))
+  result <- left_join(result, risknames)
+  
+  
+  
+  
+  
+  
   # provide my result to the next app in the MoveApps workflow
   return(result)
 }
