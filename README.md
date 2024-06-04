@@ -12,7 +12,7 @@ Assigns importance scores to spatial clusters of track locations based on variou
 
 ## Documentation
 
-This App calculates importance scores for clusters of spatially aggregated location points by combining properties such as the incidence of feeding events, duration of the cluster event, number of member tracks and average duration of visits at daytime. Clusters are scored into one of seven classes of incremental importance, indicated by the column `imp_band_label` in output: `"Insignificant"`, `"Verylow"`, `"Low"`, `"Medium"`, `"High"`, `"VeryHigh"` and  `"Critical"`.
+This App calculates importance scores for clusters of spatially aggregated location points by combining cluster attributes such as the incidence of feeding events, the number of days it was active, number of member tracks and average duration of visits during daytime. Clusters are scored into one of seven classes of incremental importance, indicated by the column `imp_band_label` in output: `"Insignificant"`, `"Verylow"`, `"Low"`, `"Medium"`, `"High"`, `"VeryHigh"` and  `"Critical"`.
 
 Cluster importance scores are key for identifying points of interest to e.g. inform ground patrolling decision-making. 
 
