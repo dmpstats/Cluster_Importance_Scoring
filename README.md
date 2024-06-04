@@ -45,7 +45,7 @@ None
 
 ### Most common errors
 
-The app will halt processing an throw an error if the dependency App 'Generate Avian Cluster Metrics' is not deployed earlier in the workflow, as the importance score relies on the presence of specific cluster properties calculated in that App.
+The app will halt processing an throw an error if the dependency App 'Generate Avian Cluster Metrics' is not deployed earlier in the workflow, as the importance score relies on the availability of specific cluster properties calculated in that App.
 
 
 ### Null or error handling
