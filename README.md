@@ -1,39 +1,53 @@
-# Name of App *(Give your app a short and informative title. Please adhere to our convention of Title Case without hyphens (e.g. My New App))*
+# Name of App Cluster Importance Scoring
 
 MoveApps
 
-Github repository: *github.com/yourAccount/Name-of-App* *(the link to the repository where the code of the app can be found must be provided)*
+Github repository: https://github.com/dmpstats/Cluster_Importance_Scoring
+
 
 ## Description
-*Enter here the short description of the App that might also be used when filling out the description when submitting the App to Moveapps. This text is directly presented to Users that look through the list of Apps when compiling Workflows.*
+
+Assigns importance scores to spatial clusters of animals based on various cluster properties, including the incidence of feeding events.with plans for a more advanced classification approach in the near future.
+
 
 ## Documentation
-*Enter here a detailed description of your App. What is it intended to be used for. Which steps of analyses are performed and how. Please be explicit about any detail that is important for use and understanding of the App and its outcomes.*
+
+This App calculates importance scores for clusters of spatially aggregated location points by combining properties such as the incidence of feeding events, duration of the cluster event, number of member tracks and average duration of visits at daytime. Clusters are scored into one of seven classes of incremental importance, indicated by the column `imp_band_label` in output: `"Insignificant"`, `"Verylow"`, `"Low"`, `"Medium"`, `"High"`, `"VeryHigh"` and  `"Critical"`.
+
+Cluster importance scores are key for identifying points of interest to e.g. inform ground patrolling decision-making. 
+
+Currently, importance scores are derived using a reasonably simplistic method. A more robust statistical modeling-based approach is under development.
+
+
+
+### MoveApps Worflow Dependencies
+
+This App relies on the prior deployment of the App [Generate Avian Cluster Metrics](https://www.moveapps.org/apps/browser/966534a5-e9d4-4431-bda0-5157bd070fff)
+([GitHub](https://github.com/dmpstats/Cluster_Importance_Scoring)) in the workflow.
+
 
 ### Input data
-*Indicate which type of input data the App requires. Currently only R objects of class `MoveStack` can be used. This will be extend in the future.*
 
-*Example*: MoveStack in Movebank format
+A `move2::move2_loc` object.
 
 ### Output data
-*Indicate which type of output data the App produces to be passed on to subsequent apps. Currently only R objects of class `MoveStack` can be used. This will be extend in the future. In case the App does not pass on any data (e.g. a shiny visualization app), it can be also indicated here that no output is produced to be used in subsequent apps.*
 
-*Example:* MoveStack in Movebank format
+A `move2::move2_loc` object.
+
 
 ### Artefacts
-*If the App creates artefacts (e.g. csv, pdf, jpeg, shapefiles, etc), please list them here and describe each.*
 
-*Example:* `rest_overview.csv`: csv-file with Table of all rest site properties
+None
 
 ### Settings 
-*Please list and define all settings/parameters that the App requires to be set by the App user, if necessary including their unit.*
 
-*Example:* `Radius of resting site` (radius): Defined radius the animal has to stay in for a given duration of time for it to be considered resting site. Unit: `metres`.
+None
 
 ### Most common errors
-*Please describe shortly what most common errors of the App can be, how they occur and best ways of solving them.*
+
+The app will halt processing an throw an error if the dependency App 'Generate Avian Cluster Metrics' is not deployed earlier in the workflow, as the importance score relies on the presence of specific cluster properties calculated in that App.
+
 
 ### Null or error handling
-*Please indicate for each setting as well as the input data which behaviour the App is supposed to show in case of errors or NULL values/input. Please also add notes of possible errors that can happen if settings/parameters are improperly set and any other important information that you find the user should be aware of.*
 
-*Example:* **Setting `radius`:** If no radius AND no duration are given, the input data set is returned with a warning. If no radius is given (NULL), but a duration is defined then a default radius of 1000m = 1km is set. 
+Not applicable.
