@@ -7,7 +7,7 @@ Github repository: https://github.com/dmpstats/Cluster_Importance_Scoring
 
 ## Description
 
-Assigns importance scores to spatial clusters of animals based on various cluster properties, including the incidence of feeding events.with plans for a more advanced classification approach in the near future.
+Assigns importance scores to spatial clusters of track locations based on various cluster properties, including the incidence of feeding events.with plans for a more advanced classification approach in the near future.
 
 
 ## Documentation
