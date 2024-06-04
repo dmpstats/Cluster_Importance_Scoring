@@ -1,4 +1,4 @@
-# Name of App Cluster Importance Scoring
+# Cluster Importance Scoring
 
 MoveApps
 
