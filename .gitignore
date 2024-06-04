@@ -14,3 +14,4 @@ data/raw/3_Savannah/clustertable.rds
 data/raw/3_Savannah/workflow.rds
 data/raw/mergedClusts.rds
 RFunction_runthrough.R
+README.html
