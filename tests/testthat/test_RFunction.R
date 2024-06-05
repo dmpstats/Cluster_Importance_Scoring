@@ -47,13 +47,13 @@ test_that("Importance calculations are skipped if conditions are not met", {
   
   # unumbiguous feeding column
   actual <- rFunction(data = test_sets$savahn |> select(-n_SFeeding))
-  expect_true(all(is.na(actual$imp_score)))
-  expect_true(all(is.na(actual$imp_band_label)))
+  expect_true(all(is.na(actual$importance_score)))
+  expect_true(all(is.na(actual$importance_label)))
   
   
   actual <- rFunction(data = test_sets$nam[1:2, ])
-  expect_true(all(is.na(actual$imp_score)))
-  expect_true(all(is.na(actual$imp_band_label)))
+  expect_true(all(is.na(actual$importance_score)))
+  expect_true(all(is.na(actual$importance_label)))
   
   
 })

@@ -76,7 +76,7 @@ rFunction = function(data) {
   
   if(length(feeding_col) != 1){
     
-    logger.warn(paste0(#
+    logger.warn(paste0(
       "Oops - could not find unambiguous name for column summarising feeding ",
       "events in cluster, making it impossible to calculate importance scores")
     )
@@ -91,20 +91,20 @@ rFunction = function(data) {
     
     qntl_probs <- c(0, 0.25, 0.5, 0.7, 0.8, 0.9, 1)
     risk_tbl <- data.frame(
-      imp_band = 0:6,
-      imp_band_label =  c("Insignificant", "Verylow", "Low", "Medium", "High", "VeryHigh", "Critical")
+      importance_band = 0:6,
+      importance_label =  c("Insignificant", "Verylow", "Low", "Medium", "High", "VeryHigh", "Critical")
     )
     
     
     # Compute naive importance score
     data <- data |> 
       mutate(
-        imp_score = .data[[feeding_col]]/n_points * n_days_active * avg_daytime_visit_duration * member_tracks_n,
-        imp_score = units::drop_units(imp_score)  # nuisance but needs doing
+        importance_score = .data[[feeding_col]]/n_points * n_days_active * avg_daytime_visit_duration * member_tracks_n,
+        importance_score = units::drop_units(importance_score)  # nuisance but needs doing
       ) 
     
-    # Compute CV impact scores greater than 0
-    imp_gt0 <- data$imp_score[data$imp_score > 0]
+    # Compute CV of importance scores greater than 0
+    imp_gt0 <- data$importance_score[data$importance_score > 0]
     cv_imp_gt0 <- sd(imp_gt0, na.rm = TRUE)/mean(imp_gt0, na.rm = TRUE)
     
     # Only proceed if there is enough variance in positive scores to compute quantile thresholds
@@ -116,10 +116,10 @@ rFunction = function(data) {
       # assign importance scores to risk threshold bands 
       data <- data |> 
         mutate(
-          imp_band = cut(imp_score, imp_thresh, labels = FALSE),
-          imp_band = ifelse(is.na(imp_band), 0, imp_band)
+          importance_band = cut(importance_score, imp_thresh, labels = FALSE),
+          importance_band = ifelse(is.na(importance_band), 0, importance_band)
         ) |>
-        left_join(risk_tbl, by = "imp_band") 
+        left_join(risk_tbl, by = "importance_band") 
       
       # log-out a summary 
       logger.info(
@@ -130,9 +130,9 @@ rFunction = function(data) {
               print( 
                 data |>
                   as_tibble() |> 
-                  count(imp_band, imp_band_label) |> 
-                  arrange(desc(imp_band)) |> 
-                  select(-imp_band), 
+                  count(importance_band, importance_label) |> 
+                  arrange(desc(importance_band)) |> 
+                  select(-importance_band), 
                 n = Inf)
             ), 
             collapse = "\n"),
@@ -154,10 +154,10 @@ rFunction = function(data) {
     
     logger.warn(paste0(
     "Conditions for the calculation of cluster importance scores were not met. ",
-    "Columns `imp_score`, `imp_bad` and `imp_band_label` to be populated with NAs.")
+    "Columns `importance_score`, `importance_band` and `importance_label` to be populated with NAs.")
     )
     
-    data <- data |> mutate(imp_score = NA, imp_band = NA, imp_band_label = NA)
+    data <- data |> mutate(importance_score = NA, importance_band = NA, importance_label = NA)
   }
   
   
