@@ -22,7 +22,8 @@ input3 <- read_rds(test_path("data/input3_move2.rds"))
 # Main rFunction -----------------------------------------
 
 test_that("output is a valid move2 object", {
-  actual <- rFunction(data = test_sets$nam)
+  
+  actual <- rFunction(data = test_sets$nam, map_output = FALSE)
   # passes {move2} check
   expect_true(move2::mt_is_move2(actual))
   # check if 1st class is "move2"
@@ -43,6 +44,7 @@ test_that("input validation is working correctly", {
 
 
 
+
 test_that("Importance calculations are skipped if conditions are not met", {
   
   # unumbiguous feeding column
@@ -54,8 +56,7 @@ test_that("Importance calculations are skipped if conditions are not met", {
   actual <- rFunction(data = test_sets$nam[1:2, ])
   expect_true(all(is.na(actual$importance_score)))
   expect_true(all(is.na(actual$importance_label)))
-  
-  
+
 })
 
 

@@ -60,6 +60,45 @@ out_dt_ken_tnz <- rFunction(data = test_dt$ken_tnz[1:10, ])
 
 
 
+
+
+
+out <- rFunction(data = test_dt$savahn, map_output = FALSE)
+
+
+out$member_tracks_n
+
+
+
+library(tmap)
+
+tmap_mode("view")
+
+out_map <- out |> 
+  as_tibble() |> 
+  st_set_geometry("centroid") |> 
+  mutate(importance_label = factor(importance_label, levels = c("Insignificant", "Verylow", "Low", "Medium", "High", "VeryHigh", "Critical"))) |> 
+  tm_shape(name = "Cluster Centroids") +
+  tm_bubbles(
+    size = "n_points",
+    col = "importance_label", 
+    style = "cat", 
+    palette = "-Spectral", 
+    title.col = "Importance",
+    scale = 1.2,
+    popup.vars = c(
+      "n_points", "spawn_dttm_local", "cease_dttm_local", "member_tracks_n", "member_tracks_ids",
+      "prop_days_inactive", "duration_days", "span_days", "n_SFeeding", "n_SResting", "n_SRoosting", 
+      "avg_daytime_visit_duration", "avg_n_daytime_visits", "avg_nightime_dist", 
+      "avg_nightime_prop_250m", "avg_nightime_prop_1km", "avg_arrival_dists",
+      "trks_mindist_m", "trks_n_within_25km", "trks_n_within_50km")
+  )
+
+out_map
+
+
+
+
 # # ---------------------------------------- #
 # # ----            SDK Testing           ----
 # # ---------------------------------------- #

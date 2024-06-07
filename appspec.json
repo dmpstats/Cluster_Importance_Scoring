@@ -1,5 +1,13 @@
 {
-  "settings": [],
+  "settings": [
+    {
+      "id": "map_output",
+      "name": "Generate Interactive Map",
+      "description": "Select this option to create an interactive map of the output as an App artefact",
+      "defaultValue": true,
+      "type": "CHECKBOX"
+    }
+  ],
   "dependencies": {
     "R": [
       {
@@ -19,9 +27,13 @@
       },
       {
         "name": "units"
+      },
+      {
+        "name": "tmap"
       }
     ]
   },
+  "createsArtifacts": true,
   "license": {
     "key": "MIT"
   },

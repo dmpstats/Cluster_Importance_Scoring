@@ -4,6 +4,7 @@ library('lubridate')
 library('sf')
 library("cli")
 library("units")
+library("tmap")
 
 
 # Wee helpers
@@ -18,7 +19,7 @@ abort_info_msg <- paste0(
 
 
 
-rFunction = function(data) {
+rFunction = function(data, map_output = TRUE) {
   
   #' -----------------------------------------------------------------
   ## 1. Input validation -----
@@ -158,6 +159,41 @@ rFunction = function(data) {
     )
     
     data <- data |> mutate(importance_score = NA, importance_band = NA, importance_label = NA)
+    
+  }else{
+    
+    if(map_output){
+    
+      logger.info("Generating interactive tmap as an App artifact")
+      
+      dt_map <- data |> 
+        as_tibble() |> 
+        st_set_geometry("centroid") |> 
+        mutate(importance_label = factor(importance_label, levels = risk_tbl$importance_label)) |> 
+        tm_shape(name = "Cluster Centroids") +
+        tm_bubbles(
+          size = "n_points",
+          col = "importance_label", 
+          style = "cat", 
+          palette = "-Spectral", 
+          title.col = "Importance",
+          scale = 1.2,
+          popup.vars = c(
+            "n_points", "spawn_dttm_local", "cease_dttm_local", "member_tracks_n", "member_tracks_ids",
+            "prop_days_inactive", "duration_days", "span_days", "n_SFeeding", "n_SResting", "n_SRoosting", 
+            "avg_daytime_visit_duration", "avg_n_daytime_visits", "avg_nightime_dist", 
+            "avg_nightime_prop_250m", "avg_nightime_prop_1km", "avg_arrival_dists",
+            "trks_mindist_m", "trks_n_within_25km", "trks_n_within_50km")
+        )
+      
+      
+      tmap_save(
+        dt_map, 
+        filename = appArtifactPath("tmap_clusters.html"), 
+        selfcontained = TRUE
+      )
+    }
+    
   }
   
   

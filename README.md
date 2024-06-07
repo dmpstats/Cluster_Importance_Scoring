@@ -37,11 +37,11 @@ A `move2::move2_loc` object.
 
 ### Artefacts
 
-None
+If option **Generate Interactive Map** is selected, an interactive map will be produced showing the centroid locations and key properties of the analysed clusters. Points are colour-coded according to their assigned importance score, and bubble size is proportional to the number of location points comprised in the cluster.
 
 ### Settings 
 
-None
+**Generate Interactive Map** (`map_output`): Select this option to create an interactive map of the output as an App artefact.
 
 ### Most common errors
 
