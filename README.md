@@ -7,16 +7,16 @@ Github repository: https://github.com/dmpstats/Cluster_Importance_Scoring
 
 ## Description
 
-Assigns importance scores to spatial clusters of track locations based on various cluster properties, including the incidence of feeding events.with plans for a more advanced classification approach in the near future.
+Assigns importance scores to spatial clusters of track locations based on various cluster properties, including the incidence of feeding events. The underlying importance scoring methodology is still a work-in-progress and is expected to be updated with a more advanced approach in the near future.
 
 
 ## Documentation
 
-This App calculates importance scores for clusters of spatially aggregated location points by combining cluster attributes such as the incidence of feeding events, the number of days it was active, number of member tracks and average duration of visits during daytime. Clusters are scored into one of seven classes of incremental importance, indicated by the column `importance_label` in output: `"Insignificant"`, `"Verylow"`, `"Low"`, `"Medium"`, `"High"`, `"VeryHigh"` and  `"Critical"`.
+This App calculates importance scores for clusters of spatially aggregated location points by combining cluster attributes such as the incidence of feeding events, the number of days it was active, number of member tracks and average duration of visits during daytime. Clusters are scored into one of seven classes of incremental importance, indicated by the column `importance_label` in output:  `"Low"`, `"Medium"`, `"High"` and  `"Critical"`.
 
 Cluster importance scores are key for identifying points of interest to e.g. inform ground patrolling decision-making. 
 
-Currently, importance scores are derived using a reasonably simplistic method. A more robust statistical modeling-based approach is under development.
+Currently, importance scores are derived using a reasonably simplistic method. A more robust statistical modelling-based approach is under development.
 
 
 
@@ -37,7 +37,7 @@ A `move2::move2_loc` object.
 
 ### Artefacts
 
-If option **Generate Interactive Map** is selected, an interactive map will be produced showing the centroid locations and key properties of the analysed clusters. Points are colour-coded according to their assigned importance score, and bubble size is proportional to the number of location points comprised in the cluster.
+- "clusters_map.html": if option **Generate Interactive Map** is selected, an interactive map will be produced showing the centroid locations and key properties of the analysed clusters. Points are colour-coded according to their assigned importance score, and point size is proportional to the number of location points comprised in the cluster.
 
 ### Settings 
 

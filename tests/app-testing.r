@@ -7,8 +7,6 @@ library(httr2)
 library(purrr)
 library(readr)
 library(sf)
-#library(ggplot2)
-
 
 # Helpers
 source("tests/app-testing-helpers.r")
@@ -39,6 +37,13 @@ testthat::test_file("tests/testthat/test_RFunction.R")
 out_dt_nam <- rFunction(data = test_dt$nam)
 out_dt_nam
 
+# input data provided as track locations
+out_dt_nam_loc <- rFunction(data = test_dt$nam_loc)
+out_dt_nam_loc
+
+
+
+
 #' --------------------------------
 #' ---- South Africa vfa
 out_dt_sa_vfa <- rFunction(data = test_dt$sa_vfa)
@@ -61,12 +66,9 @@ out_dt_ken_tnz <- rFunction(data = test_dt$ken_tnz[1:10, ])
 
 
 
-
-
 out <- rFunction(data = test_dt$savahn, map_output = FALSE)
 
 
-out$member_tracks_n
 
 
 

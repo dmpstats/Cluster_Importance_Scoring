@@ -5,6 +5,8 @@ library('sf')
 library("cli")
 library("units")
 library("tmap")
+library("leaflet")
+library("htmlwidgets")
 
 
 # Wee helpers
@@ -19,14 +21,14 @@ abort_info_msg <- paste0(
 
 
 
-rFunction = function(data, map_output = TRUE) {
+rFunction <- function(data, map_output = TRUE) {
   
   #' -----------------------------------------------------------------
   ## 1. Input validation -----
 
-  cluster_tbl_type <- attr(data, "cluster_tbl_type")
+  clust_dt_type <- attr(data, "clust_dt_type")
   
-  if(is.null(cluster_tbl_type)){
+  if(is.null(clust_dt_type)){
     
     logger.fatal("Invalid input data. See Error message for details")
     
@@ -38,15 +40,31 @@ rFunction = function(data, map_output = TRUE) {
     
   } else{
     
-    if(cluster_tbl_type == "track-and-whole"){
+    if(clust_dt_type == "track-and-whole"){
       
       data <- mt_track_data(data) |> 
         mt_as_move2(time_column = "spawn_dttm",
           track_id_column = mt_track_id_column(data)
         )
       
-    } else if(cluster_tbl_type != "whole-only"){
-     
+    } else if(clust_dt_type == "whole-binned-to-locs"){
+      
+      cluster_id_col <- attr(data, "cluster_id_col")
+      
+      # store track locations data in a separate object
+      locs_dt <- data
+      
+      # flatten cluster metrics data
+      data <- data |> 
+        dplyr::as_tibble() |> 
+        dplyr::select(dplyr::all_of(cluster_id_col), dplyr::starts_with("cl_")) |> 
+        dplyr::distinct() |> 
+        dplyr::filter(!is.na(.data[[cluster_id_col]])) |> 
+        dplyr::rename_with(~sub("cl_", "", .x), .cols = !all_of(cluster_id_col))
+        
+       
+    }else if(clust_dt_type != "whole-only"){
+      
       logger.fatal("Invalid input data. See Error message for details")
       
       cli::cli_abort(c(
@@ -55,16 +73,15 @@ rFunction = function(data, map_output = TRUE) {
       ),
       class = "invalid-input"
       )
-       
     }
   }
   
   
   #' -----------------------------------------------------------------
-  ## 2. Pre-processing
+  ## 2. Pre-processing -----
   
   # Identify name of 'feeding' column
-  feeding_col <- grep("n_.*[F|f]eed.*", names(data), value = TRUE)
+  feeding_col <- grep(".*[F|f]eed.*", names(data), value = TRUE)
   
   # flag to skip calculations, if conditions are not met
   skip <- FALSE
@@ -90,17 +107,18 @@ rFunction = function(data, map_output = TRUE) {
     #' shiny implementation. This is due to be replaced with a more advanced
     #' importance scoring method
     
-    qntl_probs <- c(0, 0.25, 0.5, 0.7, 0.8, 0.9, 1)
+    qntl_probs <- c(0, 0.5, 0.8, 1)
+    
     risk_tbl <- data.frame(
-      importance_band = 0:6,
-      importance_label =  c("Insignificant", "Verylow", "Low", "Medium", "High", "VeryHigh", "Critical")
+      importance_band = 0:3,
+      importance_label =  c("Low", "Medium", "High", "Critical")
     )
     
     
     # Compute naive importance score
     data <- data |> 
       mutate(
-        importance_score = .data[[feeding_col]]/n_points * n_days_active * avg_daytime_visit_duration * member_tracks_n,
+        importance_score = .data[[feeding_col]]/pts_n * days_active_n * visit_drtn_avg * members_n,
         importance_score = units::drop_units(importance_score)  # nuisance but needs doing
       ) 
     
@@ -166,33 +184,69 @@ rFunction = function(data, map_output = TRUE) {
     
       logger.info("Generating interactive tmap as an App artifact")
       
+      metrics_to_plot <- setdiff(
+        names(data), 
+        c("clust_id", "spawn_dttm",  "cease_dttm", "centroid", "pts_pairdist_med", 
+          "members_centroid_pairdist_med", "importance_label", "importance_band")
+      )
+      
+      
       dt_map <- data |> 
         as_tibble() |> 
         st_set_geometry("centroid") |> 
         mutate(importance_label = factor(importance_label, levels = risk_tbl$importance_label)) |> 
         tm_shape(name = "Cluster Centroids") +
-        tm_bubbles(
-          size = "n_points",
-          col = "importance_label", 
-          style = "cat", 
-          palette = "-Spectral", 
-          title.col = "Importance",
-          scale = 1.2,
-          popup.vars = c(
-            "n_points", "spawn_dttm_local", "cease_dttm_local", "member_tracks_n", "member_tracks_ids",
-            "prop_days_inactive", "duration_days", "span_days", "n_SFeeding", "n_SResting", "n_SRoosting", 
-            "avg_daytime_visit_duration", "avg_n_daytime_visits", "avg_nightime_dist", 
-            "avg_nightime_prop_250m", "avg_nightime_prop_1km", "avg_arrival_dists",
-            "trks_mindist_m", "trks_n_within_25km", "trks_n_within_50km")
+        tm_dots(
+          size = 0.15,
+          col = "importance_label",
+          style = "cat",
+          palette = "-Spectral",
+          title = "Importance",
+          popup.vars = metrics_to_plot
+        )
+        # tm_bubbles(
+        #   size = "pts_spread_area", #"n_points",
+        #   col = "importance_label",
+        #   style = "cat",
+        #   palette = "-Spectral",
+        #   title.col = "Importance",
+        #   border.lwd = 1.8,
+        #   popup.vars = metrics_to_plot
+        # )
+      
+      # tmap_save(
+      #   dt_map,
+      #   filename = appArtifactPath("clusters_map.html"),
+      #   selfcontained = TRUE
+      # )
+      
+      tmap_leaflet(dt_map) |>
+        leaflet::addMeasure(
+          primaryLengthUnit = "meters",
+          primaryAreaUnit = "sqmeters",
+          thousandsSep = "'"
+          )  |>
+        htmlwidgets::saveWidget(
+          appArtifactPath("clusters_map.html"),
+          selfcontained = TRUE
         )
       
-      
-      tmap_save(
-        dt_map, 
-        filename = appArtifactPath("tmap_clusters.html"), 
-        selfcontained = TRUE
-      )
     }
+    
+  }
+  
+  
+  
+  #' -----------------------------------------------------------------
+  ## 4. Arrange outputs -----
+  
+  if(clust_dt_type == "whole-binned-to-locs"){
+    
+    data <- data |> 
+      dplyr::select(all_of(cluster_id_col), importance_score, importance_band, importance_label) |> 
+      dplyr::rename_with(~paste0("cl_", .x), .cols = !all_of(cluster_id_col))
+    
+    data <- dplyr::left_join(locs_dt, data, by = cluster_id_col)
     
   }
   

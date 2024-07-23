@@ -72,6 +72,30 @@ nam <- study_level_wf(
 
 
 
+
+nam_loc <- study_level_wf(
+  apps_paths = apps_paths,
+  mvbk_usr = mvbk_creds$scavengersonpatrol$usr, 
+  mvbk_pwd = mvbk_creds$scavengersonpatrol$pwd,
+  study_name = "AVulture Namibia SOP", 
+  animal_ids = c("TO_6485", "GA_6594", "TO_6032", "TO_6220"),
+  tm_start = tm_end - days(15),
+  tm_end = tm_end, 
+  loc_tm_thin_mins = 3
+) |> 
+  cluster_app(
+    clustercode = "NAM",
+    path_to_app = apps_paths$clust
+  ) |> 
+  cluster_metrics_app(
+    output_type = "locs",
+    path_to_app = apps_paths$clust_metrics)
+
+
+
+
+
+
 movebank_remove_credentials()
 
 sa_vfa <- study_level_wf(
@@ -147,8 +171,10 @@ savahn <- study_level_wf(
 # ----  Combine test sets in list and export to encrypted file -----
 # ---------------------------------------------------------------- #
 
+
 test_sets <- list(
   nam = nam,
+  nam_loc = nam_loc,
   sa_vfa = sa_vfa,
   savahn = savahn,
   ken_tnz = ken_tnz

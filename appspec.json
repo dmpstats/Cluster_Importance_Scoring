@@ -30,6 +30,12 @@
       },
       {
         "name": "tmap"
+      },
+      {
+        "name": "leaflet"
+      },
+      {
+        "name": "htmlwidgets"
       }
     ]
   },

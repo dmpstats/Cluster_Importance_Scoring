@@ -35,55 +35,55 @@ set_interactive_app_testing <- function(){
 
 
 
- 
-## /////////////////////////////////////////////////////////////////////////////
-# helper to run SDK testing with different settings
-run_sdk <- function(data, 
-                    cluster_id_col = "clust_id", 
-                    behav_col = "behav",
-                    cluster_tbl_type = c("track-and-whole")
-){
-
-  require(jsonlite)
-
-  # get environmental variables specified in .env
-  dotenv::load_dot_env(".env")
-  app_config_file <- Sys.getenv("CONFIGURATION_FILE")
-  source_file <- Sys.getenv("SOURCE_FILE")
-
-  # store default app configuration
-  dflt_app_config <- jsonlite::fromJSON(app_config_file)
-  # get default input data
-  dflt_dt <- readRDS(source_file)
-
-  # set configuration to specified inputs
-  new_app_config <- list(
-    cluster_id_col = cluster_id_col,
-    behav_col = behav_col,
-    cluster_tbl_type = cluster_tbl_type
-  )
-  
-  # overwrite config file with current inputs
-  write(
-    jsonlite::toJSON(new_app_config, pretty = TRUE, auto_unbox = TRUE, null = "null"),
-    file = app_config_file
-  )
-
-  # overwrite app's source file with current input data
-  saveRDS(data, source_file)
-
-  # run SDK for the current settings
-  try(source("sdk.R"))
-
-  # reset to default config and data
-  write(
-    jsonlite::toJSON(dflt_app_config,  pretty = TRUE, auto_unbox = TRUE),
-    file = app_config_file
-  )
-  saveRDS(dflt_dt, source_file)
-
-  invisible()
-}
+#  
+# ## /////////////////////////////////////////////////////////////////////////////
+# # helper to run SDK testing with different settings
+# run_sdk <- function(data, 
+#                     cluster_id_col = "clust_id", 
+#                     behav_col = "behav",
+#                     cluster_tbl_type = c("track-and-whole")
+# ){
+# 
+#   require(jsonlite)
+# 
+#   # get environmental variables specified in .env
+#   dotenv::load_dot_env(".env")
+#   app_config_file <- Sys.getenv("CONFIGURATION_FILE")
+#   source_file <- Sys.getenv("SOURCE_FILE")
+# 
+#   # store default app configuration
+#   dflt_app_config <- jsonlite::fromJSON(app_config_file)
+#   # get default input data
+#   dflt_dt <- readRDS(source_file)
+# 
+#   # set configuration to specified inputs
+#   new_app_config <- list(
+#     cluster_id_col = cluster_id_col,
+#     behav_col = behav_col,
+#     cluster_tbl_type = cluster_tbl_type
+#   )
+#   
+#   # overwrite config file with current inputs
+#   write(
+#     jsonlite::toJSON(new_app_config, pretty = TRUE, auto_unbox = TRUE, null = "null"),
+#     file = app_config_file
+#   )
+# 
+#   # overwrite app's source file with current input data
+#   saveRDS(data, source_file)
+# 
+#   # run SDK for the current settings
+#   try(source("sdk.R"))
+# 
+#   # reset to default config and data
+#   write(
+#     jsonlite::toJSON(dflt_app_config,  pretty = TRUE, auto_unbox = TRUE),
+#     file = app_config_file
+#   )
+#   saveRDS(dflt_dt, source_file)
+# 
+#   invisible()
+# }
 
 
 
