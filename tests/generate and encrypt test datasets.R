@@ -184,5 +184,5 @@ httr2::secret_write_rds(test_sets, path = "data/raw/vult_test_data.rds", key = I
 
 
 # subset for unit testing
-unit_test_sets <- test_sets[c("nam", "savahn")]
+unit_test_sets <- test_sets[c("nam", "nam_loc", "savahn")]
 httr2::secret_write_rds(unit_test_sets, path = "tests/testthat/data/vult_unit_test_data.rds", key = I(app_key))

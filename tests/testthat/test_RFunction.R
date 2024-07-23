@@ -31,6 +31,28 @@ test_that("output is a valid move2 object", {
 })
 
 
+test_that("output has the same number of rows as input", {
+  
+  # 'track-and-whole'
+  expect_equal(
+    nrow(rFunction(test_sets$nam, map_output = FALSE)),
+    nrow(test_sets$nam)
+  )
+  
+  # 'whole-binned-to-locs'
+  expect_equal(
+    nrow(rFunction(test_sets$nam_loc, map_output = FALSE)),
+    nrow(test_sets$nam_loc)
+  )
+  
+  # 'whole-only'
+  expect_equal(
+    nrow(rFunction(test_sets$savahn, map_output = FALSE)),
+    nrow(test_sets$savahn)
+  )
+
+})
+
 
 
 test_that("input validation is working correctly", {
@@ -48,12 +70,12 @@ test_that("input validation is working correctly", {
 test_that("Importance calculations are skipped if conditions are not met", {
   
   # unumbiguous feeding column
-  actual <- rFunction(data = test_sets$savahn |> select(-SFeeding_drtn_cmpd))
+  actual <- rFunction(data = test_sets$savahn |> select(-SFeeding_drtn_cmpd), map_output = FALSE)
   expect_true(all(is.na(actual$importance_score)))
   expect_true(all(is.na(actual$importance_label)))
   
   
-  actual <- rFunction(data = test_sets$nam[1, ])
+  actual <- rFunction(data = test_sets$nam[1, ], map_output = FALSE)
   expect_true(all(is.na(actual$importance_score)))
   expect_true(all(is.na(actual$importance_label)))
 
