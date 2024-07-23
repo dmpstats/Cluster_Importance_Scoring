@@ -31,6 +31,9 @@ test_that("output is a valid move2 object", {
 })
 
 
+
+
+
 test_that("output has the same number of rows as input", {
   
   # 'track-and-whole'
@@ -52,6 +55,9 @@ test_that("output has the same number of rows as input", {
   )
 
 })
+
+
+
 
 
 
