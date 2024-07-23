@@ -190,6 +190,10 @@ rFunction <- function(data, map_output = TRUE) {
           "members_centroid_pairdist_med", "importance_label", "importance_band")
       )
       
+
+      # hack to fix bug in interaction betwteen {tmap{} and {sf}
+      # https://github.com/afrimapr/afrimapr-book/issues/30
+      sf::sf_use_s2(FALSE)
       
       dt_map <- data |> 
         as_tibble() |> 
