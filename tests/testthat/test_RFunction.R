@@ -23,6 +23,8 @@ input3 <- read_rds(test_path("data/input3_move2.rds"))
 
 test_that("output is a valid move2 object", {
   
+  withr::local_envvar("APP_ARTIFACTS_DIR"="../../data/output/")
+  
   actual <- rFunction(data = test_sets$nam, map_output = FALSE)
   # passes {move2} check
   expect_true(move2::mt_is_move2(actual))
@@ -35,6 +37,8 @@ test_that("output is a valid move2 object", {
 
 
 test_that("output has the same number of rows as input", {
+  
+  withr::local_envvar("APP_ARTIFACTS_DIR"="../../data/output/")
   
   # 'track-and-whole'
   expect_equal(
@@ -63,6 +67,8 @@ test_that("output has the same number of rows as input", {
 
 test_that("input validation is working correctly", {
   
+  withr::local_envvar("APP_ARTIFACTS_DIR"="../../data/output/")
+  
   expect_error(
     rFunction(data = input3), 
     "Invalid input data - could not find required cluster attributes"
@@ -74,6 +80,8 @@ test_that("input validation is working correctly", {
 
 
 test_that("Importance calculations are skipped if conditions are not met", {
+  
+  withr::local_envvar("APP_ARTIFACTS_DIR"="../../data/output/")
   
   # unumbiguous feeding column
   actual <- rFunction(data = test_sets$savahn |> select(-SFeeding_drtn_cmpd), map_output = FALSE)

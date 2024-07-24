@@ -218,12 +218,6 @@ rFunction <- function(data, map_output = TRUE) {
         #   popup.vars = metrics_to_plot
         # )
       
-      # tmap_save(
-      #   dt_map,
-      #   filename = appArtifactPath("clusters_map.html"),
-      #   selfcontained = TRUE
-      # )
-      
       tmap_leaflet(dt_map) |>
         leaflet::addMeasure(
           primaryLengthUnit = "meters",
@@ -231,18 +225,25 @@ rFunction <- function(data, map_output = TRUE) {
           thousandsSep = "'"
           )  |>
         htmlwidgets::saveWidget(
-          appArtifactPath("clusters_map.html"),
+          file = appArtifactPath("clusters_map.html"),
           selfcontained = TRUE
         )
-      
     }
-    
+
   }
   
   
   
   #' -----------------------------------------------------------------
   ## 4. Arrange outputs -----
+  
+  # save csv file whole-cluster metrics as an app artifact
+  data |> 
+    dplyr::as_tibble() |> 
+    dplyr::rowwise() |> 
+    mutate(members_ids = paste0(unlist(members_ids), collapse = ", ")) |> 
+    write.csv(file = appArtifactPath("clusters_tbl.csv"))
+  
   
   if(clust_dt_type == "whole-binned-to-locs"){
     

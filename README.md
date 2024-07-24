@@ -39,6 +39,8 @@ A `move2::move2_loc` object.
 
 - "clusters_map.html": if option **Generate Interactive Map** is selected, an interactive map will be produced showing the centroid locations and key properties of the analysed clusters. Points are colour-coded according to their assigned importance score, and point size is proportional to the number of location points comprised in the cluster.
 
+- "clusters_tbl.csv": a dataset with [key metrics](https://github.com/dmpstats/Generate_Avian_Cluster_Metrics?tab=readme-ov-file#cluster-metrics) and the calculated importance scores of the analysed clusters.
+
 ### Settings 
 
 **Generate Interactive Map** (`map_output`): Select this option to create an interactive map of the output as an App artefact.

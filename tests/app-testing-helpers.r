@@ -30,6 +30,8 @@ set_interactive_app_testing <- function(){
   source(here("src/common/logger.R"))
   source(here("src/io/app_files.R"))
   
+  dotenv::load_dot_env(".env")
+  
   options(dplyr.width = Inf)
 }
 
