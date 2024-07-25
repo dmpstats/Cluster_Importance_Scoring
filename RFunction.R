@@ -7,6 +7,7 @@ library("units")
 library("tmap")
 library("leaflet")
 library("htmlwidgets")
+library("readr")
 
 
 # Wee helpers
@@ -249,8 +250,7 @@ rFunction <- function(data, map_output = TRUE) {
     dplyr::as_tibble() |> 
     dplyr::rowwise() |> 
     mutate(members_ids = paste0(unlist(members_ids), collapse = ", ")) |> 
-    write.csv(file = appArtifactPath("clusters_tbl.csv"))
-  
+    readr::write_csv(file = appArtifactPath("clusters_tbl.csv"))
   
   if(clust_dt_type == "whole-binned-to-locs"){
     
