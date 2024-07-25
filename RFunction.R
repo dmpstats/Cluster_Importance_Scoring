@@ -218,13 +218,20 @@ rFunction <- function(data, map_output = TRUE) {
         #   popup.vars = metrics_to_plot
         # )
       
+      
+      # tmap_save(
+      #   dt_map,
+      #   filename = appArtifactPath("clusters_map.html"),
+      #   selfcontained = TRUE
+      # )
+      
       tmap_leaflet(dt_map) |>
         leaflet::addMeasure(
           primaryLengthUnit = "meters",
           primaryAreaUnit = "sqmeters",
           thousandsSep = "'"
           )  |>
-        htmlwidgets::saveWidget(
+        saveWidget2(
           file = appArtifactPath("clusters_map.html"),
           selfcontained = TRUE
         )
@@ -296,6 +303,19 @@ rFunction <- function(data, map_output = TRUE) {
 #   risknames <- data.frame(impBand = c(0:5), impBandchr = c("No-feeding", "Low", "Quitelow", "Medium", "High", "Critical"))
 #   result <- left_join(result, risknames)
 
-  
   return(data)
+}
+
+
+# Helper files  ----------------------------------------------------------
+
+# ////////////////////////////////////////////////////////////////////////////
+# Workaround on htmlwidgets::saveWidget for removing dependency folder that
+# persists even though `selfcontained = TRUE`
+# (found in https://github.com/ramnathv/htmlwidgets/issues/296 )
+
+saveWidget2 = function(widget, file, ...){
+  wd = setwd(dirname(file))
+  on.exit(setwd(wd))
+  htmlwidgets::saveWidget(widget, file=basename(file), ...)
 }
