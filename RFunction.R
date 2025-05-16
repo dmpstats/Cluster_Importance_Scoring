@@ -130,9 +130,9 @@ rFunction <- function(data, map_output = TRUE) {
     # load models object
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
-    #*-- dont know what pathway it should be--*#
+    fileName <- paste0(getAppFilePath("yourLocalFileSettingId"), "moveappsModels.RData")
+    load(fileName)
     
-    load(data/raw/moveappsModels.RData)
     
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # make predictions
@@ -249,7 +249,7 @@ rFunction <- function(data, map_output = TRUE) {
     #   ))
       
       skip <- TRUE
-    }
+    
   }
   
   
