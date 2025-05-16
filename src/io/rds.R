@@ -1,5 +1,5 @@
 library('move2')
-library('move')
+#library('move')
 
 readRdsInput <- function(sourceFile) {
   if(!is.null(sourceFile) && sourceFile != "") {
