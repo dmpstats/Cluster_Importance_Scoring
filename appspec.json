@@ -42,6 +42,12 @@
       }
     ]
   },
+    "providedAppFiles": [
+    {
+      "settingId": "carcass-model",
+      "from": "data/local_app_files/provided-app-files/yourLocalFileSettingId/"
+    }
+  ],
   "createsArtifacts": true,
   "license": {
     "key": "MIT"
