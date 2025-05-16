@@ -19,7 +19,7 @@ set_interactive_app_testing()
 # ----   Interactive RFunction testing  ----
 # ---------------------------------------- #
 
-test_data <- readRDS("SOME_FILE_WITH_TEST_DATA_THAT_NEEDS_TO_BE_PROVIDED_HERE")
+test_data <- readRDS("PATH_TO_SOME_FILE_WITH_TEST_DATA_NEEDS_TO_BE_PROVIDED_HERE")
 
 out_dt <- rFunction(data = test_dt)
 out_dt
