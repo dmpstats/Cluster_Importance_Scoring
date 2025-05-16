@@ -35,7 +35,7 @@ run_sdk(data = test_dt, map_output = FALSE)
 read_rds("data/output/output.rds")
 
 
-run_sdk(data = test_dt$nam)
+run_sdk(data = test_dt)
 read_rds("data/output/output.rds")
 
 
