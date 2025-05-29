@@ -21,6 +21,7 @@ set_interactive_app_testing()
 
 test_data <- readRDS("C:\\Users\\lass\\University of St Andrews\\MLM_LSHjointwork - Documents\\research\\NCZoo\\Clustering_Callum\\data\\outputdata\\ClusterData_Tanz_POImatch_Jan25_500m_2tablecluster.rds")
 
+# have to change file path in rFunction for loading data to make this work.  code in rFunction, just need commenting out/in
 out_dt <- rFunction(data = test_data, map_output=FALSE)
 out_dt
 
