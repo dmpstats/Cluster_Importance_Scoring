@@ -8,6 +8,7 @@ library("tmap")
 library("leaflet")
 library("htmlwidgets")
 library("readr")
+library("mgcv")
 
 
 # Wee helpers
@@ -129,8 +130,11 @@ rFunction <- function(data, map_output = TRUE) {
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # load models object
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
+    # had to use the first iteration to run using the interactive version
+    #fileName <- paste0("data/local_app_files", getAppFilePath("yourLocalFileSettingId"), "moveappsModels.RData")
+    # this version works for sdk testing
     fileName <- paste0(getAppFilePath("yourLocalFileSettingId"), "moveappsModels.RData")
+    
     load(fileName)
     
     
@@ -146,8 +150,8 @@ rFunction <- function(data, map_output = TRUE) {
              nonmembers_within_25km_n = ifelse(nonmembers_within_25km_n > 11, 11, nonmembers_within_25km_n),
              nonmembers_within_50km_n_orig = nonmembers_within_50km_n,  ##### switch back at end 
              nonmembers_within_50km_n = ifelse(nonmembers_within_50km_n > 11, 11, nonmembers_within_50km_n)) %>%
-      mutate(pcarc = predict(object = pcarc_n1, newdata = ., type="response"),
-             plarge = predict(object = plarge_n1, newdata = ., type="response"),
+      mutate(pcarc = as.vector(predict(object = pcarc_n1, newdata = ., type="response")),
+             plarge = as.vector(predict(object = plarge_n1, newdata = ., type="response")),
              pcarc_thresh = t_pc_n1,
              plarge_thresh = t_pl_n1,
              nonmembers_within_25km_n = nonmembers_within_25km_n_orig,
@@ -165,8 +169,8 @@ rFunction <- function(data, map_output = TRUE) {
              nonmembers_within_25km_n7 = ifelse(nonmembers_within_25km_n7 > 6, 6, nonmembers_within_25km_n7),
              nonmembers_within_50km_n_orig = nonmembers_within_50km_n,  ##### switch back at end 
              nonmembers_within_50km_n = ifelse(nonmembers_within_50km_n > 8, 8, nonmembers_within_50km_n)) %>%
-      mutate(pcarc = predict(object = pcarc_many, newdata = ., type="response"),
-             plarge = predict(object = plarge_many, newdata = ., type="response"),
+      mutate(pcarc = as.vector(predict(object = pcarc_many, newdata = ., type="response")),
+             plarge = as.vector(predict(object = plarge_many, newdata = ., type="response")),
              pcarc_thresh = t_pc_many,
              plarge_thresh = t_pl_many,
              nonmembers_within_25km_n = nonmembers_within_25km_n_orig,
@@ -248,7 +252,7 @@ rFunction <- function(data, map_output = TRUE) {
     #     "Och - not enough variability in data to warrant the calculation of importance scores"
     #   ))
       
-      skip <- TRUE
+      #skip <- TRUE
     
   }
   
