@@ -23,12 +23,12 @@ The process for calculation of the importance score for each cluster uses four b
 
 Fitted values for each cluster are converted back to binary scores using a ROC threshold and the importance determined as follows:
 
-| p(Carcass) | p(Large) | Importance  | Importance Label |
-|------------|----------|-------------|------------------|
-| 0          | 0        | 0           | Low              |
-| 0          | 1        | 1           | Medium           |
-| 1          | 0        | 2           | High             |
-| 1          | 1        | 3           | Critical         |
+| p(Carcass) | p(Large) | Importance | Importance Label |
+|------------|----------|------------|------------------|
+| 0          | 0        | 0          | Low              |
+| 0          | 1        | 1          | Medium           |
+| 1          | 0        | 2          | High             |
+| 1          | 1        | 3          | Critical         |
 
 ### MoveApps Worflow Dependencies
 
