@@ -133,9 +133,9 @@ rFunction <- function(data, map_output = TRUE) {
     # had to use the first iteration to run using the interactive version
     #fileName <- paste0("data/local_app_files", getAppFilePath("yourLocalFileSettingId"), "moveappsModels.RData")
     # this version works for sdk testing
-    fileName <- paste0(getAppFilePath("yourLocalFileSettingId"), "moveappsModels.RData")
+    # fileName <- paste0(getAppFilePath("yourLocalFileSettingId"), "moveappsModels.RData")
     
-    load(fileName)
+    load(getAuxiliaryFilePath("carcass_model"))
     
     
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
