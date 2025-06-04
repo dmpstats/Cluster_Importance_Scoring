@@ -47,8 +47,8 @@
   },
     "providedAppFiles": [
     {
-      "settingId": "carcass-model",
-      "from": "data/local_app_files/provided-app-files/yourLocalFileSettingId/"
+      "settingId": "carcass_model", 
+      "from": "data/auxiliary/user-files/provided-app-files/carcass_model/"
     }
   ],
   "createsArtifacts": true,
