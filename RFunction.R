@@ -201,34 +201,7 @@ rFunction <- function(data, map_output = TRUE) {
                                           is.na(pcarc_01) ~ 0,
                                           is.na(plarge_01) ~ 0)) %>%
       left_join(., risk_tbl)
-    
-    # # Compute naive importance score
-    # data <- data |> 
-    #   mutate(
-    #     importance_score = .data[[feeding_col]]/pts_n * days_active_n * visit_drtn_avg * members_n,
-    #     importance_score = units::drop_units(importance_score)  # nuisance but needs doing
-    #   ) 
-    # 
-    # # Compute CV of importance scores greater than 0
-    # imp_gt0 <- data$importance_score[data$importance_score > 0]
-    # cv_imp_gt0 <- sd(imp_gt0, na.rm = TRUE)/mean(imp_gt0, na.rm = TRUE)
-    # 
-    # # Only proceed if there is enough variance in positive scores to compute quantile thresholds
-    # # Assuming an arbitrary CV threshold of 75%
-    # if(isTRUE(cv_imp_gt0 > 0.75)){
-    #   
-    #   imp_thresh <- quantile(imp_gt0, probs = qntl_probs, na.rm = TRUE)
-    #   
-    #   # assign importance scores to risk threshold bands 
-    #   data <- data |> 
-    #     mutate(
-    #       importance_band = cut(importance_score, imp_thresh, labels = FALSE),
-    #       importance_band = ifelse(is.na(importance_band), 0, importance_band)
-    #     ) |>
-    #     left_join(risk_tbl, by = "importance_band") 
-    
-    
-      
+ 
       # log-out a summary 
       logger.info(
         paste0(
@@ -246,14 +219,7 @@ rFunction <- function(data, map_output = TRUE) {
             collapse = "\n"),
           "\n"
         ))
-      
-    # }else{
-    #   logger.warn(paste0(
-    #     "Och - not enough variability in data to warrant the calculation of importance scores"
-    #   ))
-      
-      #skip <- TRUE
-    
+ 
   }
   
   
@@ -329,7 +295,6 @@ rFunction <- function(data, map_output = TRUE) {
   }
   
   
-  
   #' -----------------------------------------------------------------
   ## 4. Arrange outputs -----
   
@@ -353,43 +318,6 @@ rFunction <- function(data, map_output = TRUE) {
   
   logger.info("Importance scoring task completed")
   
-  
-  # # Call provided model:
-  # modelfile <- paste0(getAppFilePath("providedModel"), "model.rds")
-  # model <- readRDS(modelfile)
-  # 
-  # # prepare for modelling - introduce an upper bound to 'days'
-  # data %<>% mutate(response_days = pmin(days, 50))
-  # 
-  # # extract the link function from the model object (m)
-  # ilink <- family(model)$linkinv
-  # 
-  # 
-  # # predict importance on the link scale (link because we make the confidence intervals
-  # # on the link scale and then back transform after)
-  # #browser()
-  # 
-  # pred <- predict(model, data, type = "link", se.fit = TRUE)
-  # pred <- cbind(pred, data)
-  # pred <- transform(pred, lwr_ci = ilink(fit - (2 * se.fit)),
-  #                   upr_ci = ilink(fit + (2 * se.fit)),
-  #                   fitted = ilink(fit)) %>%
-  #   as.data.frame() %>%
-  #   dplyr::select(fitted) %>%
-  #   unlist()
-  # 
-  # result <- data %>% mutate(importance = pred)
-  # 
-  # # browser()
-  # # band importance score
-  # #bandthresh <- quantile(clust.table$importance, probs=c(0, 0.25, 0.5, 0.7, 0.8, 0.9, 1))
-  # bandthresh <- c(0, 0.25, 0.5, 0.75, 0.9, 1.0)
-  # result %<>%
-  #   mutate(impBand = if_else(importance == 0, 0, as.numeric(cut(pred, breaks=c(bandthresh)))))
-# 
-# 
-#   risknames <- data.frame(impBand = c(0:5), impBandchr = c("No-feeding", "Low", "Quitelow", "Medium", "High", "Critical"))
-#   result <- left_join(result, risknames)
 
   return(data)
 }
