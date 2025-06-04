@@ -8,6 +8,7 @@ library("tmap")
 library("leaflet")
 library("htmlwidgets")
 library("readr")
+library("mgcv")
 
 
 # Wee helpers
@@ -115,31 +116,118 @@ rFunction <- function(data, map_output = TRUE) {
       importance_label =  c("Low", "Medium", "High", "Critical")
     )
     
-    
-    # Compute naive importance score
-    data <- data |> 
+    # make bird limited columns
+    data <- data %>%
       mutate(
-        importance_score = .data[[feeding_col]]/pts_n * days_active_n * visit_drtn_avg * members_n,
-        importance_score = units::drop_units(importance_score)  # nuisance but needs doing
+        nonmembers_within_25km_n7 = ifelse(nonmembers_within_25km_n > 7, 7, nonmembers_within_25km_n),
+        nonmembers_within_50km_n8 = ifelse(nonmembers_within_50km_n > 8, 8, nonmembers_within_50km_n),
+        proproost = attnd_SRoosting_cmpd/attnd_cmpd,
+        propfeed = attnd_SFeeding_cmpd/attnd_cmpd,
+        members_n_orig = members_n,  ##### switch back at end of code and remove this variable
+        members_n = ifelse(members_n > 7, 7, members_n)
       ) 
     
-    # Compute CV of importance scores greater than 0
-    imp_gt0 <- data$importance_score[data$importance_score > 0]
-    cv_imp_gt0 <- sd(imp_gt0, na.rm = TRUE)/mean(imp_gt0, na.rm = TRUE)
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # load models object
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # had to use the first iteration to run using the interactive version
+    #fileName <- paste0("data/local_app_files", getAppFilePath("yourLocalFileSettingId"), "moveappsModels.RData")
+    # this version works for sdk testing
+    fileName <- paste0(getAppFilePath("yourLocalFileSettingId"), "moveappsModels.RData")
     
-    # Only proceed if there is enough variance in positive scores to compute quantile thresholds
-    # Assuming an arbitrary CV threshold of 75%
-    if(isTRUE(cv_imp_gt0 > 0.75)){
-      
-      imp_thresh <- quantile(imp_gt0, probs = qntl_probs, na.rm = TRUE)
-      
-      # assign importance scores to risk threshold bands 
-      data <- data |> 
-        mutate(
-          importance_band = cut(importance_score, imp_thresh, labels = FALSE),
-          importance_band = ifelse(is.na(importance_band), 0, importance_band)
-        ) |>
-        left_join(risk_tbl, by = "importance_band") 
+    load(fileName)
+    
+    
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # make predictions
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # depends on number of birds
+    
+    # 1 bird models
+    # owing to factor level issue with new data (levels not in modelled data), restrict a bunch of parameters to the levels seen in the data.
+    n1clust <- filter(data, members_n == 1) %>%
+      mutate(nonmembers_within_25km_n_orig = nonmembers_within_25km_n,  ## switch back at end 
+             nonmembers_within_25km_n = ifelse(nonmembers_within_25km_n > 11, 11, nonmembers_within_25km_n),
+             nonmembers_within_50km_n_orig = nonmembers_within_50km_n,  ##### switch back at end 
+             nonmembers_within_50km_n = ifelse(nonmembers_within_50km_n > 11, 11, nonmembers_within_50km_n)) %>%
+      mutate(pcarc = as.vector(predict(object = pcarc_n1, newdata = ., type="response")),
+             plarge = as.vector(predict(object = plarge_n1, newdata = ., type="response")),
+             pcarc_thresh = t_pc_n1,
+             plarge_thresh = t_pl_n1,
+             nonmembers_within_25km_n = nonmembers_within_25km_n_orig,
+             nonmembers_within_50km_n = nonmembers_within_50km_n_orig) %>%
+      select(-nonmembers_within_25km_n_orig,
+             -nonmembers_within_50km_n_orig)
+    
+    
+    # MULTI bird models
+    # owing to factor level issue with new data (levels not in modelled data), restrict a bunch of parameters to the levels seen in the data.
+    nmanyclust <- filter(data, members_n > 1) %>%
+      mutate(nonmembers_within_25km_n_orig = nonmembers_within_25km_n,  ## switch back at end 
+             nonmembers_within_25km_n = ifelse(nonmembers_within_25km_n > 8, 8, nonmembers_within_25km_n),
+             nonmembers_within_25km_n7_orig = nonmembers_within_25km_n7,  ## switch back at end 
+             nonmembers_within_25km_n7 = ifelse(nonmembers_within_25km_n7 > 6, 6, nonmembers_within_25km_n7),
+             nonmembers_within_50km_n_orig = nonmembers_within_50km_n,  ##### switch back at end 
+             nonmembers_within_50km_n = ifelse(nonmembers_within_50km_n > 8, 8, nonmembers_within_50km_n)) %>%
+      mutate(pcarc = as.vector(predict(object = pcarc_many, newdata = ., type="response")),
+             plarge = as.vector(predict(object = plarge_many, newdata = ., type="response")),
+             pcarc_thresh = t_pc_many,
+             plarge_thresh = t_pl_many,
+             nonmembers_within_25km_n = nonmembers_within_25km_n_orig,
+             nonmembers_within_50km_n = nonmembers_within_50km_n_orig) %>%
+      select(-nonmembers_within_25km_n_orig,
+             -nonmembers_within_50km_n_orig, 
+             -nonmembers_within_25km_n7_orig)
+    
+    
+    # join 1 bird and multibird predictions back together and convert to 0/1s
+    data <- mt_stack(n1clust, nmanyclust) %>% 
+      arrange(clust_id) %>%
+      mutate(pcarc_01 = ifelse(pcarc > pcarc_thresh, 1, 0),
+             plarge_01 = ifelse(plarge > plarge_thresh, 1, 0))
+    
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # Annotate Clusters
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    # define importance bands
+    # simplistic for now, could perhaps be more nuanced using the actual probabilities
+    # join the risk table to get importance labels. 
+    data %<>%
+      mutate(importance_band  = case_when(pcarc_01 == 1 & plarge_01 == 1 ~ 3,
+                                          pcarc_01 == 1 & plarge_01 == 0 ~ 2,
+                                          pcarc_01 == 0 & plarge_01 == 0 ~ 0,
+                                          pcarc_01 == 0 & plarge_01 == 1 ~ 1,
+                                          is.na(pcarc_01) ~ 0,
+                                          is.na(plarge_01) ~ 0)) %>%
+      left_join(., risk_tbl)
+    
+    # # Compute naive importance score
+    # data <- data |> 
+    #   mutate(
+    #     importance_score = .data[[feeding_col]]/pts_n * days_active_n * visit_drtn_avg * members_n,
+    #     importance_score = units::drop_units(importance_score)  # nuisance but needs doing
+    #   ) 
+    # 
+    # # Compute CV of importance scores greater than 0
+    # imp_gt0 <- data$importance_score[data$importance_score > 0]
+    # cv_imp_gt0 <- sd(imp_gt0, na.rm = TRUE)/mean(imp_gt0, na.rm = TRUE)
+    # 
+    # # Only proceed if there is enough variance in positive scores to compute quantile thresholds
+    # # Assuming an arbitrary CV threshold of 75%
+    # if(isTRUE(cv_imp_gt0 > 0.75)){
+    #   
+    #   imp_thresh <- quantile(imp_gt0, probs = qntl_probs, na.rm = TRUE)
+    #   
+    #   # assign importance scores to risk threshold bands 
+    #   data <- data |> 
+    #     mutate(
+    #       importance_band = cut(importance_score, imp_thresh, labels = FALSE),
+    #       importance_band = ifelse(is.na(importance_band), 0, importance_band)
+    #     ) |>
+    #     left_join(risk_tbl, by = "importance_band") 
+    
+    
       
       # log-out a summary 
       logger.info(
@@ -159,13 +247,13 @@ rFunction <- function(data, map_output = TRUE) {
           "\n"
         ))
       
-    }else{
-      logger.warn(paste0(
-        "Och - not enough variability in data to warrant the calculation of importance scores"
-      ))
+    # }else{
+    #   logger.warn(paste0(
+    #     "Och - not enough variability in data to warrant the calculation of importance scores"
+    #   ))
       
-      skip <- TRUE
-    }
+      #skip <- TRUE
+    
   }
   
   
