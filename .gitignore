@@ -5,13 +5,4 @@
 .DS_Store
 data/output/**
 !data/output/.keep
-data/local_app_files/provided-app-files/providedModel/model.rds
-data/raw/1_Avulture/clustertable.rds
-data/raw/1_Avulture/workflow.rds
-data/raw/2_Avulture/clustertable.rds
-data/raw/2_Avulture/workflow.rds
-data/raw/3_Savannah/clustertable.rds
-data/raw/3_Savannah/workflow.rds
-data/raw/mergedClusts.rds
-RFunction_runthrough.R
-README.html
+tests/testthat/plot.png
