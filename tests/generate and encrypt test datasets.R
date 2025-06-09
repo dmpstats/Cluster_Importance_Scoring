@@ -79,7 +79,7 @@ nam_loc <- study_level_wf(
   mvbk_pwd = mvbk_creds$scavengersonpatrol$pwd,
   study_name = "AVulture Namibia SOP", 
   animal_ids = c("TO_6485", "GA_6594", "TO_6032", "TO_6220"),
-  tm_start = tm_end - days(15),
+  tm_start = tm_end - days(10),
   tm_end = tm_end, 
   loc_tm_thin_mins = 3
 ) |> 
@@ -88,8 +88,9 @@ nam_loc <- study_level_wf(
     path_to_app = apps_paths$clust
   ) |> 
   cluster_metrics_app(
-    output_type = "locs",
-    path_to_app = apps_paths$clust_metrics)
+    output_type = "merge-to-locs",
+    path_to_app = apps_paths$clust_metrics
+  )
 
 
 
