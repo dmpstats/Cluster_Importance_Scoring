@@ -28,7 +28,8 @@ set_interactive_app_testing <- function(){
   source("src/common/logger.R")
   source("src/io/app_files.R")
   
-  Sys.setenv("APP_ARTIFACTS_DIR"="./data/output/")
+  Sys.setenv("APP_ARTIFACTS_DIR" = "./data/output/")
+  Sys.setenv("USER_APP_FILE_HOME_DIR"= "./data/auxiliary/user-files")
   
   options(dplyr.width = Inf)
 }
