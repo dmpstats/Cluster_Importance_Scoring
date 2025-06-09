@@ -21,6 +21,9 @@ abort_info_msg <- paste0(
   "in the workflow immediately before this App."
 )
 
+# TODO:
+# - consider including check on presence of roosting-attendance and 
+#   total-attendance columns
 
 
 rFunction <- function(data, map_output = TRUE) {
@@ -45,7 +48,8 @@ rFunction <- function(data, map_output = TRUE) {
     if(clust_dt_type == "track-and-whole"){
       
       data <- mt_track_data(data) |> 
-        mt_as_move2(time_column = "spawn_dttm",
+        mt_as_move2(
+          time_column = "spawn_dttm",
           track_id_column = mt_track_id_column(data)
         )
       
@@ -63,7 +67,6 @@ rFunction <- function(data, map_output = TRUE) {
         dplyr::distinct() |> 
         dplyr::filter(!is.na(.data[[cluster_id_col]])) |> 
         dplyr::rename_with(~sub("cl_", "", .x), .cols = !all_of(cluster_id_col))
-        
       
       # set as move2 to minimize friction with types "track-and-whole" and
       # "whole-only" on remaining code
@@ -101,17 +104,13 @@ rFunction <- function(data, map_output = TRUE) {
   if(length(feeding_col) != 1){
     
     logger.warn(paste0(
-      "Oops - could not find unambiguous name for column summarising feeding ",
-      "events in cluster, making it impossible to calculate importance scores")
+      "Could not find unambiguous name for column summarising feeding ",
+      "events in cluster, making it impossible to calculate importance scores.")
     )
     
     skip <- TRUE
     
   } else{
-    
-    #' Currently this is a simplistic approach, based on code employed on old
-    #' shiny implementation. This is due to be replaced with a more advanced
-    #' importance scoring method
     
     qntl_probs <- c(0, 0.5, 0.8, 1)
     
@@ -131,14 +130,10 @@ rFunction <- function(data, map_output = TRUE) {
         members_n = ifelse(members_n > 7, 7, members_n)
       ) 
     
+    
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # load models object
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # had to use the first iteration to run using the interactive version
-    #fileName <- paste0("data/local_app_files", getAppFilePath("yourLocalFileSettingId"), "moveappsModels.RData")
-    # this version works for sdk testing
-    # fileName <- paste0(getAppFilePath("yourLocalFileSettingId"), "moveappsModels.RData")
-    
     load(getAuxiliaryFilePath("carcass_model"))
     
     
@@ -232,10 +227,10 @@ rFunction <- function(data, map_output = TRUE) {
     
     logger.warn(paste0(
     "Conditions for the calculation of cluster importance scores were not met. ",
-    "Columns `importance_score`, `importance_band` and `importance_label` to be populated with NAs.")
+    "Columns `importance_band` and `importance_label` to be populated with NAs.")
     )
     
-    data <- data |> mutate(importance_score = NA, importance_band = NA, importance_label = NA)
+    data <- data |> mutate(importance_band = NA, importance_label = NA)
     
   }else{
     
@@ -321,9 +316,7 @@ rFunction <- function(data, map_output = TRUE) {
     
   }
   
-  
   logger.info("Importance scoring task completed")
-  
 
   return(data)
 }
