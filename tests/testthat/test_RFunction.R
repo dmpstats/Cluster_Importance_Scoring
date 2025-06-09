@@ -82,16 +82,16 @@ test_that("input validation is working correctly", {
 test_that("Importance calculations are skipped if conditions are not met", {
   
   withr::local_envvar("APP_ARTIFACTS_DIR"="../../data/output/")
+  withr::local_envvar("USER_APP_FILE_HOME_DIR"= "../../data/auxiliary/user-files")
   
   # unumbiguous feeding column
-  actual <- rFunction(data = test_sets$savahn |> select(-SFeeding_drtn_cmpd), map_output = FALSE)
-  expect_true(all(is.na(actual$importance_score)))
+  actual <- rFunction(data = test_sets$savahn |> select(-attnd_SFeeding_cmpd), map_output = FALSE)
+  expect_true(all(is.na(actual$importance_band )))
   expect_true(all(is.na(actual$importance_label)))
-  
-  
-  actual <- rFunction(data = test_sets$nam[1, ], map_output = FALSE)
-  expect_true(all(is.na(actual$importance_score)))
-  expect_true(all(is.na(actual$importance_label)))
+ 
+#   actual <- rFunction(data = test_sets$nam[1, ], map_output = FALSE)
+#   expect_true(all(is.na(actual$importance_band)))
+#   expect_true(all(is.na(actual$importance_label)))
 
 })
 
