@@ -30,9 +30,17 @@ Fitted values for each cluster are converted back to binary scores using a ROC t
 | 1          | 0        | 2          | High             |
 | 1          | 1        | 3          | Critical         |
 
-### MoveApps Worflow Dependencies
+### Application scope
 
-This App relies on the prior deployment of the App [Generate Avian Cluster Metrics](https://www.moveapps.org/apps/browser/966534a5-e9d4-4431-bda0-5157bd070fff) ([GitHub](https://github.com/dmpstats/Cluster_Importance_Scoring)) in the workflow.
+#### Generality of App usability
+
+This App has been developed specifically for Vulture species.
+
+#### Required data properties
+
+This App is strictly dependent on the prior deployment of the App [Generate Avian Cluster Metrics](https://www.moveapps.org/apps/browser/966534a5-e9d4-4431-bda0-5157bd070fff) ([GitHub](https://github.com/dmpstats/Cluster_Importance_Scoring)) in the workflow.
+
+~~~
 
 ### Input data
 
