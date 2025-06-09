@@ -40,8 +40,6 @@ This App has been developed specifically for Vulture species.
 
 This App is strictly dependent on the prior deployment of the App [Generate Avian Cluster Metrics](https://www.moveapps.org/apps/browser/966534a5-e9d4-4431-bda0-5157bd070fff) ([GitHub](https://github.com/dmpstats/Cluster_Importance_Scoring)) in the workflow.
 
-~~~
-
 ### Input data
 
 A `move2::move2_loc` object.
