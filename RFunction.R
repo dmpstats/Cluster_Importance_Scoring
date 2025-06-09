@@ -64,6 +64,10 @@ rFunction <- function(data, map_output = TRUE) {
         dplyr::filter(!is.na(.data[[cluster_id_col]])) |> 
         dplyr::rename_with(~sub("cl_", "", .x), .cols = !all_of(cluster_id_col))
         
+      
+      # set as move2 to minimize friction with types "track-and-whole" and
+      # "whole-only" on remaining code
+      data <- data |> mt_as_move2(time_column = "spawn_dttm", track_id_column = cluster_id_col)
        
     }else if(clust_dt_type != "whole-only"){
       
@@ -308,9 +312,11 @@ rFunction <- function(data, map_output = TRUE) {
   if(clust_dt_type == "whole-binned-to-locs"){
     
     data <- data |> 
-      dplyr::select(all_of(cluster_id_col), importance_score, importance_band, importance_label) |> 
+      dplyr::as_tibble() |> # required to allow for the join, below
+      dplyr::select(all_of(cluster_id_col), pcarc, plarge, importance_band, importance_label) |> 
       dplyr::rename_with(~paste0("cl_", .x), .cols = !all_of(cluster_id_col))
     
+    # merge back to location-based data  
     data <- dplyr::left_join(locs_dt, data, by = cluster_id_col)
     
   }
