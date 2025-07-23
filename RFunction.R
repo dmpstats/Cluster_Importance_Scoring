@@ -10,7 +10,6 @@ library("htmlwidgets")
 library("readr")
 library("mgcv")
 
-
 # Wee helpers
 `%!in%` <- Negate(`%in%`)
 not_null <- Negate(is.null)
@@ -129,6 +128,7 @@ rFunction <- function(data, map_output = TRUE) {
         members_n = ifelse(members_n > 7, 7, members_n)
       ) 
     
+    #browser()
     
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # load models object
@@ -254,11 +254,11 @@ rFunction <- function(data, map_output = TRUE) {
         mutate(importance_label = factor(importance_label, levels = risk_tbl$importance_label)) |> 
         tm_shape(name = "Cluster Centroids") +
         tm_dots(
-          size = 0.15,
-          col = "importance_label",
-          style = "cat",
-          palette = "-Spectral",
-          title = "Importance",
+          fill = "importance_label",
+          fill.legend = tm_legend(title = "Importance"),
+          size = 0.8, 
+          fill.scale = tm_scale_categorical(values = "-brewer.spectral"),
+          #title = "Importance",
           popup.vars = metrics_to_plot
         )
         # tm_bubbles(
