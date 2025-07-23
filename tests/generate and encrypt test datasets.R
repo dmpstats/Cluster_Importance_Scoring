@@ -23,15 +23,15 @@ require(clock)
 
 options(dplyr.width = Inf)
 
-source("../../Workflows_simulator/fcts_apps_wrappers.R")
-source("../../Workflows_simulator/helpers.r")
-source("../../Workflows_simulator/fcts_study_level_workflows.R")
+source("../../MoveApps_workflow_simulator/fcts_apps_wrappers.R")
+source("../../MoveApps_workflow_simulator/helpers.r")
+source("../../MoveApps_workflow_simulator/fcts_study_level_workflows.R")
 source("tests/app-testing-helpers.r")
 
 proj_key <- get_proj_key()
 app_key <- get_app_key()
 
-mvbk_creds <- httr2::secret_read_rds("../../Workflows_simulator/mvbk_creds.rds", key = I(proj_key))
+mvbk_creds <- httr2::secret_read_rds("../../MoveApps_workflow_simulator/mvbk_creds.rds", key = I(proj_key))
 
 apps_paths <- list(
   mvbkloc = "../Movebank-Loc-move2/",
@@ -43,6 +43,17 @@ apps_paths <- list(
   clust_metrics = "../Generate_Avian_Cluster_Metrics//"
 )
 
+
+# download apps' package dependencies
+apps_deps <- lapply(
+  apps_paths, function(path){
+    renv::dependencies(paste0(path, "RFunction.r"))$Package
+  }
+) |>
+  unlist() |>
+  unique()
+
+pak::pkg_install(apps_deps)
 
 
 # ----------------------------------------------- #
@@ -69,7 +80,6 @@ nam <- study_level_wf(
   cluster_metrics_app(
     cluster_tbl_type = "track-and-whole",
     path_to_app = apps_paths$clust_metrics)
-
 
 
 
