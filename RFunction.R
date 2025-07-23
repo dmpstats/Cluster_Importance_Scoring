@@ -43,6 +43,8 @@ rFunction <- function(data, map_output = TRUE) {
     
   } else{
     
+    cluster_id_col <- attr(data, "cluster_id_col")
+    
     if(clust_dt_type == "track-and-whole"){
       
       data <- mt_track_data(data) |> 
@@ -52,8 +54,6 @@ rFunction <- function(data, map_output = TRUE) {
         )
       
     } else if(clust_dt_type == "whole-binned-to-locs"){
-      
-      cluster_id_col <- attr(data, "cluster_id_col")
       
       # store track locations data in a separate object
       locs_dt <- data
