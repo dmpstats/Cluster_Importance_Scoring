@@ -25,7 +25,6 @@ abort_info_msg <- paste0(
 # - consider including check on presence of roosting-attendance and 
 #   total-attendance columns
 
-
 rFunction <- function(data, map_output = TRUE) {
   
   #' -----------------------------------------------------------------
@@ -178,12 +177,12 @@ rFunction <- function(data, map_output = TRUE) {
              -nonmembers_within_50km_n_orig, 
              -nonmembers_within_25km_n7_orig)
     
-    
     # join 1 bird and multibird predictions back together and convert to 0/1s
     data <- mt_stack(n1clust, nmanyclust) %>% 
-      arrange(clust_id) %>%
+      arrange(.data[[cluster_id_col]]) %>%
       mutate(pcarc_01 = ifelse(pcarc > pcarc_thresh, 1, 0),
              plarge_01 = ifelse(plarge > plarge_thresh, 1, 0))
+    
     
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # Annotate Clusters
@@ -240,7 +239,7 @@ rFunction <- function(data, map_output = TRUE) {
       
       metrics_to_plot <- setdiff(
         names(data), 
-        c("clust_id", "spawn_dttm",  "cease_dttm", "centroid", "pts_pairdist_med", 
+        c(cluster_id_col, "spawn_dttm",  "cease_dttm", "centroid", "pts_pairdist_med", 
           "members_centroid_pairdist_med", "importance_label", "importance_band")
       )
       
