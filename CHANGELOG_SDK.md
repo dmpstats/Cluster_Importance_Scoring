@@ -1,5 +1,11 @@
 # Changelog SDK
-## XXX XXX
+
+## 2025-07 `v3.3.0`
+
+- introduce app-setting-type `SECRET`
+
+## 2024-08
+
 - update of `README.md` including new sections
 - update of `developer_README.md`
 

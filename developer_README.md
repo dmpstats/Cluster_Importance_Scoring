@@ -41,6 +41,7 @@ Critical parts of the SDK can be adjusted by `environment variables`. Keep in mi
 - `APP_ARTIFACTS_DIR`: base directory for writing App artifacts
 - `USER_APP_FILE_HOME_DIR`: home aka base directory of your local user/auxiliary App files
 - `CLEAR_OUTPUT`: clears all output of the previously app run at each start of the SDK aka the next app start
+- `MASK_SETTING_IDS`: A comma-separated list of setting IDs whose values will be hidden in the SDK logs
 
 You can adjust these environment variables by adjusting the file `./.env`.
 
