@@ -6,6 +6,13 @@
       "description": "Select this option to create an interactive map of the output as an App artefact",
       "defaultValue": true,
       "type": "CHECKBOX"
+    },
+    {
+      "id": "nest_thresh_days",
+      "name": "Potential Nest Threshold (days)",
+      "description": "Consecutive days after which an active cluster is flagged as a potential nest. Such clusters are automatically given a low importance score. Leave blank to skip nest identification.",
+      "defaultValue": 40,
+      "type": "INTEGER"
     }
   ],
   "dependencies": {

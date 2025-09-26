@@ -103,6 +103,36 @@ test_that("Importance calculations are skipped if conditions are not met", {
   
 })
 
+
+
+
+
+
+test_that("Nests identification works as expected", {
+  
+  withr::local_envvar("APP_ARTIFACTS_DIR"="../../data/output/")
+  
+  # 3 nests expected
+  dt <- test_sets$savahn |> 
+    mutate(timespan_ndays = ifelse(clust_id %in% c("SAV.11", "SAV.10", "SAV.12"), c(45, 50, 100), timespan_ndays))
+
+  out <- rFunction(data = dt, nest_thresh_days = 40, map_output = FALSE)
+  out_nests <- filter(out, potential_nest)
+  
+  expect_equal(out_nests$clust_id, c("SAV.10", "SAV.11", "SAV.12"))
+  expect_true(all(out_nests$importance_band == 0))
+  expect_true(all(out_nests$importance_label == "Low"))
+  
+
+  # no nests expected
+  out <- rFunction(data = test_sets$savahn, nest_thresh_days = 100, map_output = FALSE)
+  expect_true(all(out$potential_nest == FALSE))
+  
+  
+  # no nest identification, i.e. nest_thresh_days set to NULL
+  out <- rFunction(data = test_sets$savahn, nest_thresh_days = NULL, map_output = FALSE)
+  expect_true(all(is.na(out$potential_nest)))
+    
 })
 
 

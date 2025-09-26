@@ -24,7 +24,7 @@ abort_info_msg <- paste0(
 # - consider including check on presence of roosting-attendance and 
 #   total-attendance columns
 
-rFunction <- function(data, map_output = TRUE) {
+rFunction <- function(data, nest_thresh_days = 40, map_output = TRUE) {
   
   #' -----------------------------------------------------------------
   ## 1. Input validation -----
@@ -239,8 +239,30 @@ rFunction <- function(data, map_output = TRUE) {
     
     #browser()
     
+    data <- data |> 
+      dplyr::mutate(
+        potential_nest = timespan_ndays > nest_thresh_days,
+        # if potential next identified, downgrade importance band and label 
+        # to 0 & "Low", respectively
+        importance_band = ifelse(potential_nest == TRUE, 0, importance_band),
+        importance_label = ifelse(potential_nest == TRUE, "Low", importance_label)
       )
+    
+    nests <- dplyr::filter(data, potential_nest)
+    
+    if(nrow(nests) > 0){
+      cluster_ids <- nests[[cluster_id_col]]
+      cluster_spans <- nests$timespan_ndays
       
+      logger.info(paste0(
+        "\t|> ", nrow(nests), " cluster(s) identified as potential nest(s), i.e. lasting > ", nest_thresh_days, " days threshold:\n",
+        paste(paste0("\t\t- ", cluster_ids, ": ", cluster_spans, " days"), collapse = "\n"), "\n",
+        "\t|> Setting cluster(s) `importance_label` to 'Low' \n"
+      ))
+    } else{
+      logger.info("\t|> No potential nests found.")
+    } 
+  }
 
   # log-out a summary 
   logger.info(
@@ -322,7 +344,7 @@ rFunction <- function(data, map_output = TRUE) {
   
   
   #' -----------------------------------------------------------------
-  ## 4. Arrange outputs -----
+  ## 6. Arrange outputs -----
   
   # save csv file whole-cluster metrics as an app artifact
   data |> 

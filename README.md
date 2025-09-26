@@ -30,6 +30,9 @@ Fitted values for each cluster are converted back to binary scores using a ROC t
 | 1          | 0        | 2          | High             |
 | 1          | 1        | 3          | Critical         |
 
+
+In addition, the App uses a simple duration threshold (via parameter `nest_thresh_days`) to flag long-lasting clusters that may represent nesting. These clusters are automatically assigned a "Low" importance score. While many are likely to correspond to nests, such clusters may also represent water-drinking sources, food 'restaurants', or other prolonged non-carcass spatial aggregations.
+
 ### Application scope
 
 #### Generality of App usability
@@ -57,6 +60,7 @@ A `move2::move2_loc` object.
 ### Settings
 
 **Generate Interactive Map** (`map_output`): Select this option to create an interactive map of the output as an App artefact.
+**Potential Nest Threshold (days)** (`nest_thresh_days`): Consecutive days after which an active cluster is flagged as a potential nest. Such clusters are automatically given a low importance score. Leave blank to skip nest identification.
 
 ### Most common errors
 
