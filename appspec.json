@@ -11,7 +11,7 @@
       "id": "nest_thresh_days",
       "name": "Potential Nest Threshold (days)",
       "description": "Consecutive days after which an active cluster is flagged as a potential nest. Such clusters are automatically given a low importance score. Leave blank to skip nest identification.",
-      "defaultValue": 40,
+      "defaultValue": 50,
       "type": "INTEGER"
     }
   ],

@@ -24,7 +24,7 @@ abort_info_msg <- paste0(
 # - consider including check on presence of roosting-attendance and 
 #   total-attendance columns
 
-rFunction <- function(data, nest_thresh_days = 40, map_output = TRUE) {
+rFunction <- function(data, nest_thresh_days = 50, map_output = TRUE) {
   
   #' -----------------------------------------------------------------
   ## 1. Input validation -----
