@@ -15,9 +15,9 @@ library("mgcv")
 not_null <- Negate(is.null)
 
 abort_info_msg <- paste0(
-  "Please deploy a suitable cluster metrics calculation App such as ",
-  " {.href [Generate Avian Cluster Metrics](https://www.moveapps.org/apps/browser/966534a5-e9d4-4431-bda0-5157bd070fff)} ",
-  "in the workflow immediately before this App."
+  "This App is strictly dependent on the",
+  " {.href [Generate Avian Cluster Metrics](https://www.moveapps.org/apps/browser/966534a5-e9d4-4431-bda0-5157bd070fff)} App. ",
+  "Please deploy that App in the workflow immediately before this one."
 )
 
 # TODO:
@@ -36,7 +36,7 @@ rFunction <- function(data, map_output = TRUE) {
     logger.fatal("Invalid input data. See Error message for details")
     
     cli::cli_abort(c(
-      "Invalid input data - could not find required cluster attributes",
+      "Invalid input data - could not find required cluster attributes.",
       "i" = abort_info_msg),
     class = "invalid-input"
     )
@@ -185,7 +185,7 @@ rFunction <- function(data, map_output = TRUE) {
     
     
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # Annotate Clusters
+    #         Annotate Clusters
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     # define importance bands
