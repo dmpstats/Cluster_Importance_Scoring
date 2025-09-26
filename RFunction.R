@@ -293,7 +293,7 @@ rFunction <- function(data, nest_thresh_days = 40, map_output = TRUE) {
     metrics_to_plot <- setdiff(
       names(data), 
       c(cluster_id_col, "spawn_dttm",  "cease_dttm", "centroid", "pts_pairdist_med", 
-        "members_centroid_pairdist_med", "importance_label", "importance_band")
+        "members_centroid_pairdist_med", "importance_label", "importance_band", "potential_nest")
     )
     
     # hack to fix bug in interaction between {tmap{} and {sf}
@@ -357,7 +357,7 @@ rFunction <- function(data, nest_thresh_days = 40, map_output = TRUE) {
     
     data <- data |> 
       dplyr::as_tibble() |> # required to allow for the join, below
-      dplyr::select(all_of(cluster_id_col), pcarc, plarge, importance_band, importance_label) |> 
+      dplyr::select(all_of(cluster_id_col), pcarc, plarge, importance_band, importance_label, potential_nest) |> 
       dplyr::rename_with(~paste0("cl_", .x), .cols = !all_of(cluster_id_col))
     
     # merge back to location-based data  
