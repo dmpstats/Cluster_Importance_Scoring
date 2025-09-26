@@ -86,12 +86,22 @@ test_that("Importance calculations are skipped if conditions are not met", {
   
   # unumbiguous feeding column
   actual <- rFunction(data = test_sets$savahn |> select(-attnd_SFeeding_cmpd), map_output = FALSE)
-  expect_true(all(is.na(actual$importance_band )))
-  expect_true(all(is.na(actual$importance_label)))
- 
-#   actual <- rFunction(data = test_sets$nam[1, ], map_output = FALSE)
-#   expect_true(all(is.na(actual$importance_band)))
-#   expect_true(all(is.na(actual$importance_label)))
+  
+  expect_true(all(actual$importance_band == 0))
+  expect_true(all(actual$importance_label == "Low"))
+
+  
+  # unumbiguous resting AND roosting columns
+  actual <- rFunction(
+    data = test_sets$savahn |> 
+      select(-c(attnd_SFeeding_cmpd, attnd_SRoosting_cmpd)), 
+    map_output = FALSE
+  )
+  
+  expect_true(all(actual$importance_band == 0))
+  expect_true(all(actual$importance_label == "Low"))
+  
+})
 
 })
 

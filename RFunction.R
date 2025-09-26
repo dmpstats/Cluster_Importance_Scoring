@@ -69,7 +69,7 @@ rFunction <- function(data, map_output = TRUE) {
       # set as move2 to minimize friction with types "track-and-whole" and
       # "whole-only" on remaining code
       data <- data |> mt_as_move2(time_column = "spawn_dttm", track_id_column = cluster_id_col)
-       
+      
     }else if(clust_dt_type != "whole-only"){
       
       logger.fatal("Invalid input data. See Error message for details")
@@ -87,28 +87,37 @@ rFunction <- function(data, map_output = TRUE) {
   #' -----------------------------------------------------------------
   ## 2. Pre-processing -----
   
-  # Identify name of 'feeding' column
+  # Identify name of required behaviour columns
   feeding_col <- grep(".*[F|f]eed.*", names(data), value = TRUE)
+  roosting_col <- grep(".*[R|r]oost.*", names(data), value = TRUE)
+  resting_col <- grep(".*[R|r]est.*", names(data), value = TRUE)
   
-  # flag to skip calculations, if conditions are not met
-  skip <- FALSE
+  # skip calculations, if conditions are not met
+  missing_key_col <- sapply(
+    list(feeding = feeding_col, roosting = roosting_col, resting = resting_col), 
+    \(x) length(x) != 1
+  )
+  
+  if(any(missing_key_col)){
+    skip <- TRUE
+    logger.warn(
+      cli::format_inline(
+        "Failed to find unambiguous name{?s} for required column{?s} ",
+        "summarising {.field {names(missing_key_col)[missing_key_col]}} events ",
+        "in provided cluster metrics. Therefore, importance scores cannot be calculated."
+      )
+    )
+  } else{
+    skip <- FALSE
+  }
   
   
   #' -----------------------------------------------------------------
   ## 3. Importance Score Calculation  -----
   
-  logger.info("Calculating importance scores for each cluster")
-  
-  if(length(feeding_col) != 1){
+  if(!skip){
     
-    logger.warn(paste0(
-      "Could not find unambiguous name for column summarising feeding ",
-      "events in cluster, making it impossible to calculate importance scores.")
-    )
-    
-    skip <- TRUE
-    
-  } else{
+    logger.info("Calculating importance scores for each cluster")
     
     qntl_probs <- c(0, 0.5, 0.8, 1)
     
@@ -199,97 +208,116 @@ rFunction <- function(data, map_output = TRUE) {
                                           is.na(pcarc_01) ~ 0,
                                           is.na(plarge_01) ~ 0)) %>%
       left_join(., risk_tbl)
- 
-      # log-out a summary 
-      logger.info(
-        paste0(
-          "Summary Cluster Importance Scores:\n\n",
-          paste0(
-            capture.output(
-              print( 
-                data |>
-                  as_tibble() |> 
-                  count(importance_band, importance_label) |> 
-                  arrange(desc(importance_band)) |> 
-                  select(-importance_band), 
-                n = Inf)
-            ), 
-            collapse = "\n"),
-          "\n"
-        ))
- 
+    
+    
+  } else{
+    
+    logger.warn(paste0(
+      "Conditions for the calculation of cluster importance scores were not met. ",
+      "Column `importance_label` set to default value 'Low'.")
+    )
+    
+    data <- data |> 
+      mutate(
+        pcarc_01 = NA, plarge_01 = NA, importance_band = 0, 
+        importance_label = "Low"
+      )
   }
   
   
-  # Populate importance columns with NAs
-  if(skip){
+  #' -----------------------------------------------------------------
+  ## 4. Nests Identification                 -----
+  
+  logger.info("Identifying potential nests")
+  
+  if(is.null(nest_thresh_days)){
     
-    logger.warn(paste0(
-    "Conditions for the calculation of cluster importance scores were not met. ",
-    "Columns `importance_band` and `importance_label` to be populated with NAs.")
-    )
+    logger.info("\t|> `nest_thresh_days` set to NULL - assigning NAs to column `potential_nest`")
+    data <- dplyr::mutate(data, potential_nest = NA)
     
-    data <- data |> mutate(importance_band = NA, importance_label = NA)
+  } else {
     
-  }else{
+    #browser()
     
-    if(map_output){
-    
-      logger.info("Generating interactive tmap as an App artifact")
-      
-      metrics_to_plot <- setdiff(
-        names(data), 
-        c(cluster_id_col, "spawn_dttm",  "cease_dttm", "centroid", "pts_pairdist_med", 
-          "members_centroid_pairdist_med", "importance_label", "importance_band")
       )
       
 
-      # hack to fix bug in interaction betwteen {tmap{} and {sf}
-      # https://github.com/afrimapr/afrimapr-book/issues/30
-      sf::sf_use_s2(FALSE)
-      
-      dt_map <- data |> 
-        as_tibble() |> 
-        st_set_geometry("centroid") |> 
-        mutate(importance_label = factor(importance_label, levels = risk_tbl$importance_label)) |> 
-        tm_shape(name = "Cluster Centroids") +
-        tm_dots(
-          fill = "importance_label",
-          fill.legend = tm_legend(title = "Importance"),
-          size = 0.8, 
-          fill.scale = tm_scale_categorical(values = "-brewer.spectral"),
-          #title = "Importance",
-          popup.vars = metrics_to_plot
-        )
-        # tm_bubbles(
-        #   size = "pts_spread_area", #"n_points",
-        #   col = "importance_label",
-        #   style = "cat",
-        #   palette = "-Spectral",
-        #   title.col = "Importance",
-        #   border.lwd = 1.8,
-        #   popup.vars = metrics_to_plot
-        # )
-      
-      
-      # tmap_save(
-      #   dt_map,
-      #   filename = appArtifactPath("clusters_map.html"),
-      #   selfcontained = TRUE
-      # )
-      
-      tmap_leaflet(dt_map) |>
-        leaflet::addMeasure(
-          primaryLengthUnit = "meters",
-          primaryAreaUnit = "sqmeters",
-          thousandsSep = "'"
-          )  |>
-        saveWidget2(
-          file = appArtifactPath("clusters_map.html"),
-          selfcontained = TRUE
-        )
-    }
+  # log-out a summary 
+  logger.info(
+    paste0(
+      "Summary of Cluster Importance Scores:\n\n",
+      paste0(
+        capture.output(
+          print( 
+            data |>
+              as_tibble() |> 
+              count(importance_band, importance_label) |> 
+              arrange(desc(importance_band)) |> 
+              select(-importance_band), 
+            n = Inf)
+        ), 
+        collapse = "\n"),
+      "\n"
+    ))
+  
+  
+  #' -----------------------------------------------------------------
+  ## 5. Generate map, if required  -----
+  
+  if(!skip && map_output){
 
+    logger.info("Generating interactive tmap as an App artifact")
+    
+    metrics_to_plot <- setdiff(
+      names(data), 
+      c(cluster_id_col, "spawn_dttm",  "cease_dttm", "centroid", "pts_pairdist_med", 
+        "members_centroid_pairdist_med", "importance_label", "importance_band")
+    )
+    
+    # hack to fix bug in interaction between {tmap{} and {sf}
+    # https://github.com/afrimapr/afrimapr-book/issues/30
+    sf::sf_use_s2(FALSE)
+    
+    dt_map <- data |> 
+      as_tibble() |> 
+      st_set_geometry("centroid") |> 
+      mutate(importance_label = factor(importance_label, levels = risk_tbl$importance_label)) |> 
+      tm_shape(name = "Cluster Centroids") +
+      tm_dots(
+        fill = "importance_label",
+        fill.legend = tm_legend(title = "Importance"),
+        size = 0.8, 
+        fill.scale = tm_scale_categorical(values = "-brewer.spectral"),
+        #title = "Importance",
+        popup.vars = metrics_to_plot
+      )
+    # tm_bubbles(
+    #   size = "pts_spread_area", #"n_points",
+    #   col = "importance_label",
+    #   style = "cat",
+    #   palette = "-Spectral",
+    #   title.col = "Importance",
+    #   border.lwd = 1.8,
+    #   popup.vars = metrics_to_plot
+    # )
+    
+    
+    # tmap_save(
+    #   dt_map,
+    #   filename = appArtifactPath("clusters_map.html"),
+    #   selfcontained = TRUE
+    # )
+    
+    tmap_leaflet(dt_map) |>
+      leaflet::addMeasure(
+        primaryLengthUnit = "meters",
+        primaryAreaUnit = "sqmeters",
+        thousandsSep = "'"
+      )  |>
+      saveWidget2(
+        file = appArtifactPath("clusters_map.html"),
+        selfcontained = TRUE
+      )
   }
   
   
