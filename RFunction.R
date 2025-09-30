@@ -292,8 +292,9 @@ rFunction <- function(data, nest_thresh_days = 50, map_output = TRUE) {
     
     metrics_to_plot <- setdiff(
       names(data), 
+      # metrics to exclude from plots
       c(cluster_id_col, "spawn_dttm",  "cease_dttm", "centroid", "pts_pairdist_med", 
-        "members_centroid_pairdist_med", "importance_label", "importance_band", "potential_nest")
+        "members_centroid_pairdist_med", "pts_locs")
     )
     
     # hack to fix bug in interaction between {tmap{} and {sf}
