@@ -219,8 +219,8 @@ rFunction <- function(data, nest_thresh_days = 50, map_output = TRUE) {
     
     data <- data |> 
       mutate(
-        pcarc_01 = NA, plarge_01 = NA, importance_band = 0, 
-        importance_label = "Low"
+        pcarc = NA, plarge = NA, pcarc_01 = NA, plarge_01 = NA, 
+        importance_band = 0, importance_label = "Low"
       )
   }
   

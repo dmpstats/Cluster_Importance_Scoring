@@ -101,6 +101,12 @@ test_that("Importance calculations are skipped if conditions are not met", {
   expect_true(all(actual$importance_band == 0))
   expect_true(all(actual$importance_label == "Low"))
   
+  # location-based data
+  actual <- rFunction(data = test_sets$nam_loc |> select(-cl_attnd_SFeeding_cmpd), map_output = FALSE)
+  
+  expect_true(all(actual$cl_importance_band == 0))
+  expect_true(all(actual$cl_importance_label == "Low"))
+  
 })
 
 
