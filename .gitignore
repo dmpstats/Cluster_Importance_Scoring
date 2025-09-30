@@ -6,3 +6,6 @@
 data/output/**
 !data/output/.keep
 tests/testthat/plot.png
+data/raw/Namibia__Generate_Avian_Cluster_Metrics__2025-06-06_10-58-39.rds
+data/raw/Study_level_Workflows__Gaia_Vulture__Generate_Avian_Cluster_Metrics__2025-09-30_14-02-44.rds
+data/raw/Test_cluster_Metrics_and_Importance_Apps__Namibia__Generate_Avian_Cluster_Metrics__2025-09-30_14-18-04.rds
