@@ -312,7 +312,8 @@ rFunction <- function(data, nest_thresh_days = 50, map_output = TRUE) {
         size = 0.8, 
         fill.scale = tm_scale_categorical(values = "-brewer.spectral"),
         #title = "Importance",
-        popup.vars = metrics_to_plot
+        popup.vars = metrics_to_plot,
+        id = cluster_id_col
       )
     # tm_bubbles(
     #   size = "pts_spread_area", #"n_points",
